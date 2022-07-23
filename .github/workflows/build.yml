@@ -15,7 +15,23 @@ jobs:
           docker cp box:/opt/www/box.macos.arm64 .
           docker cp box:/opt/www/box.macos.x86_64 .
           docker cp box:/opt/www/box.linux.x86_64 .
-      - name: Run
+      - name: Rename
         run: |
-          chmod u+x box.linux.x86_64
-          ./box.linux.x86_64
+          mv box.macos.arm64 sgit.darwin.arm64
+          mv box.macos.x86_64 sgit.darwin.x86_64
+          mv box.linux.x86_64 sgit.linux.x86_64
+      - name: Upload artifact for sgit
+        uses: actions/upload-artifact@v3
+        with:
+          name: sgit.darwin.arm64
+          path: sgit.darwin.arm64
+      - name: Upload artifact for sgit
+        uses: actions/upload-artifact@v3
+        with:
+          name: sgit.darwin.x86_64
+          path: sgit.darwin.x86_64
+      - name: Upload artifact for sgit
+        uses: actions/upload-artifact@v3
+        with:
+          name: sgit.linux.x86_64
+          path: sgit.linux.x86_64
