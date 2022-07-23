@@ -13,10 +13,12 @@ LABEL maintainer="Hyperf Developers <group@hyperf.io>" version="1.0" license="MI
 ##
 # --build-arg timezone=Asia/Shanghai
 ARG timezone
+ARG version
 
 ENV TIMEZONE=${timezone:-"Asia/Shanghai"} \
     APP_ENV=prod \
-    SCAN_CACHEABLE=(true)
+    SCAN_CACHEABLE=(true) \
+    APP_VERSION=${version:-"develop"}
 
 # update
 RUN set -ex \
@@ -52,7 +54,8 @@ WORKDIR /opt/www
 # RUN composer install --no-dev --no-scripts
 
 COPY . /opt/www
-RUN composer install --no-dev -o && php bin/hyperf.php && php bin/hyperf.php phar:build --name box.phar \
+RUN echo APP_VERSION=${APP_VERSION} > .env \
+    && composer install --no-dev -o && php bin/hyperf.php && php bin/hyperf.php phar:build --name box.phar \
     && cat /micro.8.0.arm64.sfx box.phar > box.macos.arm64 && chmod u+x box.macos.arm64 \
     && cat /micro.8.0.x86_64.sfx box.phar > box.macos.x86_64 && chmod u+x box.macos.x86_64 \
     && cat /micro.8.0.linux.x86_64.sfx box.phar > box.linux.x86_64 && chmod u+x box.linux.x86_64
