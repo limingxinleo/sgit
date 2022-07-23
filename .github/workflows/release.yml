@@ -23,3 +23,42 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
+      - name: Build
+        run: |
+          docker build -t box-skeleton .
+          docker run --entrypoint /bin/sh --name box box-skeleton
+          docker cp box:/opt/www/box.macos.arm64 .
+          docker cp box:/opt/www/box.macos.x86_64 .
+          docker cp box:/opt/www/box.linux.x86_64 .
+      - name: Rename
+        run: |
+          mv box.macos.arm64 sgit.darwin.arm64
+          mv box.macos.x86_64 sgit.darwin.x86_64
+          mv box.linux.x86_64 sgit.linux.x86_64
+      - name: Release and Upload Assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.release_upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: sgit.darwin.arm64
+          asset_name: sgit.darwin.arm64
+          asset_content_type: application/octet-stream
+      - name: Release and Upload Assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.release_upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: sgit.darwin.x86_64
+          asset_name: sgit.darwin.x86_64
+          asset_content_type: application/octet-stream
+      - name: Release and Upload Assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.release_upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: sgit.linux.x86_64
+          asset_name: sgit.linux.x86_64
+          asset_content_type: application/octet-stream
